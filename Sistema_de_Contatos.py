@@ -3,7 +3,6 @@ from datetime import datetime
 
 BANCO = "contatos.db"
 
-
 def conectar():
     return sqlite3.connect(BANCO)
 
