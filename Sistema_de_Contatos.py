@@ -1,12 +1,14 @@
+# Importando o banco de dados
 import sqlite3
 from datetime import datetime
 
 BANCO = "contatos.db"
 
+# Conectando o banco de dados
 def conectar():
     return sqlite3.connect(BANCO)
 
-
+# Criando as tabelas do banco de dados
 def criar_tabela():
     conexao = conectar()
     cursor = conexao.cursor()
@@ -35,6 +37,7 @@ def limpar_linha():
     print("-" * 50)
 
 
+# Colocando os nomes das variaveis em contato
 def adicionar_contato():
     print("\n=== ADICIONAR CONTATO ===")
     nome = input("Nome: ").strip()
@@ -42,12 +45,14 @@ def adicionar_contato():
     email = input("Email: ").strip()
     cidade = input("Cidade: ").strip()
 
+    # Colocando a obrigatoriedade das variáveis
     if not nome or not telefone or not email:
         print("Nome, telefone e email são obrigatórios.")
         return
 
     criado_em = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
 
+    # Conectando as variáveis ao banco de dados
     try:
         conexao = conectar()
         cursor = conexao.cursor()
@@ -65,10 +70,11 @@ def adicionar_contato():
     except sqlite3.IntegrityError:
         print("Erro: já existe um contato com esse email.")
 
-
+# Listando os contatos
 def listar_contatos():
     print("\n=== LISTA DE CONTATOS ===")
 
+    # Conectando ao banco dados
     conexao = conectar()
     cursor = conexao.cursor()
 
@@ -83,7 +89,7 @@ def listar_contatos():
     if len(contatos) == 0:
         print("Nenhum contato cadastrado.")
         return
-
+    
     for contato in contatos:
         favorito = "Sim" if contato[5] == 1 else "Não"
 
@@ -97,11 +103,12 @@ def listar_contatos():
         print(f"Criado em: {contato[6]}")
     limpar_linha()
 
-
+# Busca por nomes
 def buscar_por_nome():
     print("\n=== BUSCAR CONTATO POR NOME ===")
     nome = input("Digite o nome: ").strip()
 
+    # Conectando ao banco de dados
     conexao = conectar()
     cursor = conexao.cursor()
 
@@ -115,6 +122,7 @@ def buscar_por_nome():
     contatos = cursor.fetchall()
     conexao.close()
 
+    # Busca por contatos
     if len(contatos) == 0:
         print("Nenhum contato encontrado.")
         return
@@ -139,6 +147,7 @@ def buscar_por_id():
     try:
         id_contato = int(input("Digite o ID: "))
 
+        # Conectando ao banco dados
         conexao = conectar()
         cursor = conexao.cursor()
 
@@ -177,6 +186,7 @@ def atualizar_contato():
     try:
         id_contato = int(input("Digite o ID do contato: "))
 
+        # Conectando ao banco de dados
         conexao = conectar()
         cursor = conexao.cursor()
 
@@ -188,6 +198,7 @@ def atualizar_contato():
             conexao.close()
             return
 
+        # Atualizando contatos
         print("\nDeixe em branco para manter o valor atual.")
         novo_nome = input(f"Novo nome ({contato[1]}): ").strip()
         novo_telefone = input(f"Novo telefone ({contato[2]}): ").strip()
@@ -199,6 +210,7 @@ def atualizar_contato():
         email_final = novo_email if novo_email else contato[3]
         cidade_final = nova_cidade if nova_cidade else contato[4]
 
+        # Conectando o banco de dados com os dados novos
         cursor.execute("""
             UPDATE contatos
             SET nome = ?, telefone = ?, email = ?, cidade = ?
@@ -222,12 +234,14 @@ def remover_contato():
     try:
         id_contato = int(input("Digite o ID do contato: "))
 
+        # Conectando ao banco de dados
         conexao = conectar()
         cursor = conexao.cursor()
 
         cursor.execute("SELECT nome FROM contatos WHERE id = ?", (id_contato,))
         contato = cursor.fetchone()
 
+        # Remoção de contatos
         if contato is None:
             print("Contato não encontrado.")
             conexao.close()
@@ -254,6 +268,7 @@ def favoritar_contato():
     try:
         id_contato = int(input("Digite o ID do contato: "))
 
+        # Conectando ao banco de dados
         conexao = conectar()
         cursor = conexao.cursor()
 
@@ -276,6 +291,7 @@ def favoritar_contato():
         conexao.commit()
         conexao.close()
 
+        # Favoritando os contatos
         if novo_valor == 1:
             print(f"{contato[1]} foi marcado como favorito.")
         else:
@@ -285,9 +301,11 @@ def favoritar_contato():
         print("Digite um ID válido.")
 
 
+
 def listar_favoritos():
     print("\n=== CONTATOS FAVORITOS ===")
 
+    # Conectando ao banco de dados
     conexao = conectar()
     cursor = conexao.cursor()
 
@@ -304,7 +322,8 @@ def listar_favoritos():
     if len(contatos) == 0:
         print("Nenhum contato favorito.")
         return
-
+    
+    # Listar o id favoritado
     for contato in contatos:
         limpar_linha()
         print(f"ID: {contato[0]}")
@@ -317,6 +336,7 @@ def listar_favoritos():
 
 
 def contar_contatos():
+    # Conectando ao banco de dados
     conexao = conectar()
     cursor = conexao.cursor()
 
@@ -327,12 +347,12 @@ def contar_contatos():
     favoritos = cursor.fetchone()[0]
 
     conexao.close()
-
+    
     print("\n=== RESUMO ===")
     print(f"Total de contatos: {total}")
     print(f"Total de favoritos: {favoritos}")
 
-
+# Opções do Menu
 def menu():
     while True:
         print("\n" + "=" * 50)
